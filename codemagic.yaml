@@ -1,0 +1,36 @@
+workflows:
+  ios-workflow:
+    name: S-TRAH iOS Build
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+
+    scripts:
+      - name: Get Flutter packages
+        script: flutter pub get
+
+      - name: Build iOS (unsigned)
+        script: |
+          flutter build ios --release --no-codesign
+
+      - name: Package as IPA
+        script: |
+          cd build/ios/iphoneos
+          mkdir -p Payload
+          cp -r Runner.app Payload/
+          zip -r strah_mvp.ipa Payload/
+
+    artifacts:
+      - build/ios/iphoneos/strah_mvp.ipa
+      - build/ios/iphoneos/Runner.app
+      - flutter_drive.log
+
+    publishing:
+      email:
+        recipients:
+          - avijeetbanik551@gmail.com
+        notify:
+          success: true
+          failure: true
